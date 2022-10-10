@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 # 网络固定写法
 class Network(nn.Module):
     def __init__(self):
@@ -12,7 +11,6 @@ class Network(nn.Module):
     def forward(self, x):
         pass
         return x
-
 
 # 卷积后尺寸大小: (W-K+2P)/S  + 1
 # 池化后尺寸大小：（W-K)/S  + 1
@@ -38,7 +36,6 @@ class LeNet(nn.Module):
         x = F.relu(self.fc2(x))  # output(84)
         x = self.fc3(x)  # output(10)
         return x
-
 
 net = LeNet()
 print(net)
