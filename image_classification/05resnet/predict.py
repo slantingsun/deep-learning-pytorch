@@ -39,6 +39,7 @@ def main():
     model.eval()
     with torch.no_grad():
         outputs = model(img.to(device))
+        # torch.squeeze(tensor) 将tensor中大小为1的维度删除  torch.squeeze(tensor,dim） 如果该dim维度大小不为1，则保持原来的shape不变,否则删除
         outputs = torch.squeeze(outputs).cpu()
         outputs = torch.softmax(outputs, dim=0)
         # torch.argmax 返回输入张量中指定维度的最大值的索引。

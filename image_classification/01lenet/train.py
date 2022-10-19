@@ -11,15 +11,19 @@ import sys
 def main():
     data_dir = r'./data'
     image_transforms = {
-        'train': transforms.Compose([
+        "train": transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ]),
-        'val': transforms.Compose([
+        "val": transforms.Compose([
+            transforms.Resize((224, 224)),  # cannot 224, must (224, 224)
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
     }
+
     train_dataset = datasets.CIFAR10(data_dir, True, image_transforms['train'], download=True)
     val_dataset = datasets.CIFAR10(data_dir, False, image_transforms['val'], download=True)
     train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=0)
@@ -61,7 +65,7 @@ def main():
             running_loss += loss.item() * inputs.size(0)
             _, preds = torch.max(outputs, 1)
             running_corrects += ((preds == labels).sum().item())
-        # 也可以直接n+=1,直接除以n，上面去掉乘以inputs.size(0)
+        # 也可以直接除以len(train_dataloader)，但是要把上面的乘以inputs.size(0)去掉，一样的意思
         epoch_train_loss = running_loss / len(train_dataset)
         epoch_train_acc = running_corrects / len(train_dataset)
 
@@ -83,8 +87,9 @@ def main():
         print(f"Train Loss {epoch_train_loss} Acc{epoch_train_acc}")
         print(f"Val Loss {epoch_val_loss} Acc{epoch_val_acc}")
         if best_acc < epoch_val_acc:
-            torch.save(model.state_dict(),save_path)
+            torch.save(model.state_dict(), save_path)
             best_acc = epoch_val_acc
+
 
 if __name__ == '__main__':
     main()

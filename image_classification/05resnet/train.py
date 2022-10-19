@@ -58,8 +58,8 @@ def main():
     train_num = len(train_dataset)
     val_num = len(val_dataset)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=nw)
-    val_dataloader = DataLoader(val_dataset, batch_size=64, shuffle=True, num_workers=nw)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=nw)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=nw)
 
     print(f"Using {train_num} images for training, {val_num} images for validation.")
 
@@ -75,21 +75,21 @@ def main():
     # model = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.IMAGENET1K_V1)
     # model.fc = nn.Linear(model.fc.in_features, 10)
 
-    # ****************************************** 新增
+    # *********************新增*********************
     model = resnet34()
     # 官方下载
     model_weight_path = "./resnet34-pre.pth"
     assert os.path.exists(model_weight_path), f"{model_weight_path} path not exist."
     model.load_state_dict(torch.load(model_weight_path, map_location="cpu"))
     # 看notion迁移学习部分
-    # for param in model.parameters():
-    #     param.requires_grad = False
+    for param in model.parameters():
+        param.requires_grad = False
     model.fc = nn.Linear(model.fc.in_features, 5)
 
     # 流水线三件套
     model = model.to(device)
     loss_function = nn.CrossEntropyLoss()
-    # ****************************************** 新增
+    # *********************新增*********************
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.Adam(params, 0.001)
 

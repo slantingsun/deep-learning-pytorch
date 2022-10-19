@@ -4,6 +4,7 @@ import torch
 from torchvision import transforms
 
 from my_dataset import MyDataSet
+from torch.utils.data import DataLoader
 from utils import read_split_data, plot_data_loader_image
 
 # https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz
@@ -19,7 +20,7 @@ def main():
     data_transform = {
         "train": transforms.Compose([transforms.RandomResizedCrop(224),
                                      transforms.RandomHorizontalFlip(),
-                                     transforms.ToTensor(),
+                                     transforms.ToTensor(), # 会将数据缩放到0-1之间
                                      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
         "val": transforms.Compose([transforms.Resize(256),
                                    transforms.CenterCrop(224),
@@ -36,7 +37,7 @@ def main():
     train_loader = torch.utils.data.DataLoader(train_data_set,
                                                batch_size=batch_size,
                                                shuffle=True,
-                                               num_workers=nw,
+                                               num_workers=nw,  # 测试时最好设为0，win10设为0
                                                collate_fn=train_data_set.collate_fn)
 
     # plot_data_loader_image(train_loader)

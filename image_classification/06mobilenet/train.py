@@ -10,9 +10,7 @@ from torch.utils.data import DataLoader
 from model_v2 import MobileNetV2
 from tqdm import tqdm
 import sys
-
-
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -75,18 +73,22 @@ def main():
     # model = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.IMAGENET1K_V1)
     # model.fc = nn.Linear(model.fc.in_features, 10)
 
-    # ****************************************** 新增
+    # ******************新增************************
     model = MobileNetV2(num_classes=5)
     # 官方下载
     model_weight_path = "./MobileNetV2-pre.pth"
     assert os.path.exists(model_weight_path), f"{model_weight_path} path not exist."
     pre_weights = torch.load(model_weight_path, map_location="cpu")
 
+    # *********************新增*********************
     # delete classifier weights
     pre_dict = {k: v for k, v in pre_weights.items() if model.state_dict()[k].numel() == v.numel()}
     missing_keys, unexpected_keys = model.load_state_dict(pre_dict, strict=False)
+    print(f"missing_keys:{missing_keys}")
+    print(f"unexpected_keys{unexpected_keys}")
 
-    for param in model.parameters():
+    # *********************新增*********************
+    for param in model.features.parameters():
         param.requires_grad = False
 
     # 流水线三件套

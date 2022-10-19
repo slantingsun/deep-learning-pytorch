@@ -6,6 +6,7 @@ import torch
 import torchvision.transforms as transforms
 from PIL import Image
 from model_v2 import MobileNetV2
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -31,7 +32,7 @@ def main():
         class_idx = json.load(json_file)
 
     model = MobileNetV2(num_classes=5).to(device)
-    weight_path = "./AlexNet.pth"
+    weight_path = "./MobileNetV2.pth"
     assert os.path.exists(weight_path), f"path {weight_path} is not exist."
 
     model.load_state_dict(torch.load(weight_path, map_location=device))
@@ -39,6 +40,7 @@ def main():
     model.eval()
     with torch.no_grad():
         outputs = model(img.to(device))
+        # torch.squeeze(tensor) 将tensor中大小为1的维度删除  torch.squeeze(tensor,dim） 如果该dim维度大小不为1，则保持原来的shape不变,否则删除
         outputs = torch.squeeze(outputs).cpu()
         outputs = torch.softmax(outputs, dim=0)
         # torch.argmax 返回输入张量中指定维度的最大值的索引。
@@ -46,6 +48,6 @@ def main():
         preds_idx = torch.argmax(outputs)
 
     plt_title = f"class:{class_idx[str[preds_idx]]} probability:{outputs[preds_idx].numpy():.3f}"
-    # plt.title(plt_title)
+    plt.title(plt_title)
     for i in range(len(preds_idx)):
         print(f"class:{class_idx[str[i]]} probability:{preds_idx[i].numpy():.3f}")

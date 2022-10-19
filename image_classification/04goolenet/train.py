@@ -19,11 +19,14 @@ def main():
     print(f"using {device} device.")
 
     image_transforms = {
-        'train': transforms.Compose([
+        "train": transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ]),
-        'val': transforms.Compose([
+        "val": transforms.Compose([
+            transforms.Resize((224, 224)),  # cannot 224, must (224, 224)
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
@@ -32,12 +35,10 @@ def main():
     assert os.path.exists(data_root), f"{data_root} path not exist."
 
     batch_size = 64
-    ################################################################## 新增
     # 设置num_workers
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])
     print(f'Using {nw} dataloader workers every process')
 
-    ################################################################## 新增
     # 使用ImageFolder构成dataset
     # 文件结构
     #  train
@@ -48,7 +49,6 @@ def main():
     train_dataset = datasets.ImageFolder(root=os.path.join(data_root, "train"), transform=image_transforms["train"])
     val_dataset = datasets.ImageFolder(root=os.path.join(data_root, "val"), transform=image_transforms["val"])
 
-    ################################################################## 新增
     # 将文件名与标签名对应字典，写入文件
     # {'daisy':0, 'dandelion':1, 'roses':2, 'sunflower':3, 'tulips':4}
     data_name_list = train_dataset.class_to_idx
@@ -62,8 +62,8 @@ def main():
     train_num = len(train_dataset)
     val_num = len(val_dataset)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=nw)
-    val_dataloader = DataLoader(val_dataset, batch_size=64, shuffle=True, num_workers=nw)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=nw)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=nw)
 
     print(f"Using {train_num} images for training, {val_num} images for validation.")
 
@@ -80,6 +80,9 @@ def main():
     # model.fc = nn.Linear(model.fc.in_features, 10)
 
     model = GoogLeNet(num_classes=10, init_weights=True)
+
+    # *********************新增*********************
+
     # 如果要使用官方的预训练权重，注意是将权重载入官方的模型，不是我们自己实现的模型
     # 官方的模型中使用了bn层以及改了一些参数，不能混用
     # import torchvision
@@ -93,7 +96,6 @@ def main():
     # pretrain_dict = {k: v for k, v in pretrain_model.items() if k not in del_list}
     # model_dict.update(pretrain_dict)
     # net.load_state_dict(model_dict)
-
 
     # 流水线三件套
     model = model.to(device)

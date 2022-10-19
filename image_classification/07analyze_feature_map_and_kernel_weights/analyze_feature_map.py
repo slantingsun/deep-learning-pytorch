@@ -49,3 +49,13 @@ for feature_map in out_put:
         plt.imshow(im[:, :, i], cmap='gray')
     plt.show()
 
+# def show_image_batch(img_list, title=None):
+#     num = len(img_list)
+#     fig = plt.figure()
+#     for i in range(num):
+#         ax = fig.add_subplot(1, num, i+1)
+#         ax.imshow(img_list[i].numpy().transpose([1,2,0]))
+#         ax.set_title(title[i])
+#
+#     plt.show()
+

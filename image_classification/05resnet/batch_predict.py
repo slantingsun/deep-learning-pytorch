@@ -33,6 +33,7 @@ def main():
     model = resnet34(num_classes=5).to(device)
     weight_path = "./AlexNet.pth"
     assert os.path.exists(weight_path), f"path {weight_path} is not exist."
+    model.load_state_dict(torch.load(weight_path, map_location=device))
 
     # predict
     model.eval()

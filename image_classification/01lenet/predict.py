@@ -9,13 +9,14 @@ def main():
                'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
     transform = transforms.Compose([
+        transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ])
 
     img = Image.open("1.jpg")
     img = transform(img)  # [C,H,W]
-    # unsqueeze增加一维度，pytorch数据的格式是[batch,channel,height,weidth]，太抽象想不出来的话，就别想了，用[B,C,H,W]代替
+    # unsqueeze增加一维度，pytorch处理数据的格式是[batch,channel,height,width]，即[B,C,H,W]
     img = torch.unsqueeze(img, dim=0)  # [B,C,H,W]
 
     save_path = './model.pth'
@@ -24,6 +25,7 @@ def main():
 
     with torch.no_grad():
         outputs = model(img)
+        # 这里分清torch.max和torch.argmax
         _, preds = torch.max(outputs, 1)
     print(classes[int(preds)])
 

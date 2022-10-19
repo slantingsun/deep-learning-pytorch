@@ -21,25 +21,29 @@ def main():
     print(f"using {device} device.")
 
     image_transforms = {
-        'train': transforms.Compose([
+        "train": transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ]),
-        'val': transforms.Compose([
+        "val": transforms.Compose([
+            transforms.Resize((224, 224)),  # cannot 224, must (224, 224)
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
     }
+
     data_root = r'./data'
     assert os.path.exists(data_root), f"{data_root} path not exist."
 
     batch_size = 64
-    ################################################################## 新增
-    # 设置num_workers
+    # *********************新增*********************
+    # 设置num_workers，windows下设为0即可
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])
     print(f'Using {nw} dataloader workers every process')
 
-    ################################################################## 新增
+    # *********************新增*********************
     # 使用ImageFolder构成dataset
     # 文件结构
     #  train
@@ -50,7 +54,7 @@ def main():
     train_dataset = datasets.ImageFolder(root=os.path.join(data_root, "train"), transform=image_transforms["train"])
     val_dataset = datasets.ImageFolder(root=os.path.join(data_root, "val"), transform=image_transforms["val"])
 
-    ################################################################## 新增
+    # *********************新增*********************
     # 将文件名与标签名对应字典，写入文件
     # {'daisy':0, 'dandelion':1, 'roses':2, 'sunflower':3, 'tulips':4}
     data_name_list = train_dataset.class_to_idx
@@ -64,8 +68,8 @@ def main():
     train_num = len(train_dataset)
     val_num = len(val_dataset)
 
-    train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=nw)
-    val_dataloader = DataLoader(val_dataset, batch_size=64, shuffle=True, num_workers=nw)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=nw)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=nw)
 
     print(f"Using {train_num} images for training, {val_num} images for validation.")
 
@@ -111,7 +115,7 @@ def main():
             _, preds = torch.max(outputs, 1)
             running_corrects += ((preds == labels).sum().item())
 
-            ################################################################## 新增
+            # *********************新增*********************
             # 设置tqdm显示信息
             train_bar.desc = f"train epochs {i + 1}/{epochs} loss:{loss:.3f}"
         # 也可以直接n+=1,直接除以n，上面去掉乘以inputs.size(0)

@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 # 网络固定写法
 class Network(nn.Module):
     def __init__(self):
@@ -11,6 +12,7 @@ class Network(nn.Module):
     def forward(self, x):
         pass
         return x
+
 
 # 卷积后尺寸大小: (W-K+2P)/S  + 1
 # 池化后尺寸大小：（W-K)/S  + 1
@@ -37,13 +39,15 @@ class LeNet(nn.Module):
         x = self.fc3(x)  # output(10)
         return x
 
-net = LeNet()
-print(net)
 
-data = torch.rand((1, 3, 32, 32))
-net(data)
+if __name__ == "__main__":
+    net = LeNet()
+    print(net)
 
-# similar to keras summary
-# pip install torchsummary
-# from torchsummary import summary
-# summary(model, input_size=(3, 256, 256))
+    data = torch.rand((1, 3, 32, 32))
+    print(net(data))
+
+    # similar to keras summary
+    # pip install torchsummary
+    # from torchsummary import summary
+    # summary(model, input_size=(3, 256, 256))

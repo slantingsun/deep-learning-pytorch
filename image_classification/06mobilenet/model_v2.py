@@ -1,14 +1,23 @@
+import torchvision.ops
 from torch import nn
 import torch
 
 
 def _make_divisible(ch, divisor=8, min_ch=None):
     """
+    保证所有的通道数可以被8整除
+    :param ch: 通道数
+    :param divisor: 除数8
+    :param min_ch: 最小除数
+    :return:
+    """
+    """
     This function is taken from the original tf repo.
     It ensures that all layers have a channel number that is divisible by 8
     It can be seen here:
     https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet.py
     """
+
     if min_ch is None:
         min_ch = divisor
     new_ch = max(min_ch, int(ch + divisor / 2) // divisor * divisor)
@@ -20,7 +29,7 @@ def _make_divisible(ch, divisor=8, min_ch=None):
 
 class ConvBNReLU(nn.Sequential):
     def __init__(self, in_channel, out_channel, kernel_size=3, stride=1, groups=1):
-        padding = (kernel_size - 1) // 2
+        padding = (kernel_size - 1) // 2  # 取整
         super(ConvBNReLU, self).__init__(
             # 如果groups=1就是普通卷积，groups=inchannel就是dw卷积
             nn.Conv2d(in_channel, out_channel, kernel_size, stride, padding, groups=groups, bias=False),
@@ -29,7 +38,13 @@ class ConvBNReLU(nn.Sequential):
         )
 
 
+nn.ConvTranspose2d()
+
+
 class InvertedResidual(nn.Module):
+    """
+    残差模块
+    """
     def __init__(self, in_channel, out_channel, stride, expand_ratio):
         super(InvertedResidual, self).__init__()
         hidden_channel = in_channel * expand_ratio

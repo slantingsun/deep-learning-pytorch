@@ -3,7 +3,7 @@ import json
 import pickle
 import random
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 def read_split_data(root: str, val_rate: float = 0.2):
@@ -37,6 +37,7 @@ def read_split_data(root: str, val_rate: float = 0.2):
         # 记录该类别的样本数量
         every_class_num.append(len(images))
         # 按比例随机采样验证样本
+        # random.sample用于截取列表的指定长度的随机数，但是不会改变列表本身的排序
         val_path = random.sample(images, k=int(len(images) * val_rate))
 
         for img_path in images:
@@ -105,3 +106,9 @@ def read_pickle(file_name: str) -> list:
     with open(file_name, 'rb') as f:
         info_list = pickle.load(f)
         return info_list
+
+if __name__=="__main__":
+    li = ["1.txt","2.txt","10.txt","101.txt","201.txt"]
+    print(li)
+    li.sort()
+    print(li)
