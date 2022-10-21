@@ -47,9 +47,9 @@ class Bottleneck(nn.Module):
                                kernel_size=3, stride=stride, bias=False, padding=1)
         self.bn2 = nn.BatchNorm2d(out_channel)
         # -----------------------------------------
-        self.conv3 = nn.Conv2d(in_channels=out_channel, out_channels=out_channel*self.expansion,
+        self.conv3 = nn.Conv2d(in_channels=out_channel, out_channels=out_channel * self.expansion,
                                kernel_size=1, stride=1, bias=False)  # unsqueeze channels
-        self.bn3 = nn.BatchNorm2d(out_channel*self.expansion)
+        self.bn3 = nn.BatchNorm2d(out_channel * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
 
@@ -140,3 +140,22 @@ def resnet34(num_classes=1000, include_top=True):
 
 def resnet101(num_classes=1000, include_top=True):
     return ResNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, include_top=include_top)
+
+
+if __name__ == "__main__":
+    import random
+    from torch.utils.tensorboard import SummaryWriter
+
+    writer = SummaryWriter('runs/fashion_mnist_experiment_1')
+    model = resnet34(num_classes=10)
+    # 将模型写入tensorboard
+    init_img = torch.zeros((1, 3, 224, 224))
+    writer.add_graph(model, init_img)
+
+    tags = ["train_loss", "accuracy", "learning_rate"]
+    for epoch in range(30):
+        mean_loss = random.randint(0, 10)
+        writer.add_scalar("train_loss", mean_loss, epoch)
+
+    writer.add_histogram(tag="conv1", values=model.conv1.weight, global_step=epoch)
+    writer.close
